@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 # To-Do Application
 
 A single-page application that allows users to create and manage a list of tasks.<br />
@@ -32,4 +30,3 @@ Created using functional components, hooks, fetch, routing, localStorage.
 - Fork and clone this repository
 - Run `npm install` in your terminal
 - Run `npm start` to start the project locally
->>>>>>> 2f56d2aaae3dea045fb89d62e5bf08e54c050d1a
