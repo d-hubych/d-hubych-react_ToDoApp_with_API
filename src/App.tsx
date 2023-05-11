@@ -1,27 +1,31 @@
-import React from 'react';
-import './App.scss';
+import React, { FC, useState } from 'react';
+import { HashRouter } from 'react-router-dom';
+import { AuthorizationPage } from './pages/AuthorizationPage';
+import { TodosPage } from './pages/TodosPage';
+import { User } from './types/User';
 
-interface Props {
-  onClick: () => void;
-}
+const getLocalUser = (): User | null => {
+  const stringUser: string | null = localStorage.getItem('user');
 
-export const Provider: React.FC<Props> = React.memo(
-  ({ onClick, children }) => (
-    <button
-      type="button"
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  ),
-);
+  if (stringUser) {
+    return JSON.parse(stringUser);
+  }
 
-export const App: React.FC = () => {
+  return null;
+};
+
+export const App: FC = () => {
+  const [user, setUser] = useState<User | null>(getLocalUser());
+
   return (
-    <div className="starter">
-      <Provider onClick={() => ({})}>
-        <TodoList />
-      </Provider>
-    </div>
+    <>
+      {user
+        ? (
+          <HashRouter>
+            <TodosPage user={user} />
+          </HashRouter>
+        )
+        : <AuthorizationPage setUser={setUser} />}
+    </>
   );
 };
