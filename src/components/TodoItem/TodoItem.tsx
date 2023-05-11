@@ -64,19 +64,18 @@ export const TodoItem: React.FC<Props> = ({
       )}
       onDoubleClick={() => setIsEditing(true)}
     >
-      {/* <label className="todo__status-label"> */}
-      <input
-        type="checkbox"
-        className="todo__status"
-        checked={completed}
-        onChange={() => toggleTodo([todo])}
-      />
-      {/* </label> */}
+      <label className="todo__status-label">
+        <input
+          type="checkbox"
+          className="todo__status"
+          checked={completed}
+          onChange={() => toggleTodo([todo])}
+        />
+      </label>
 
       {isEditing
         ? (
           <form onSubmit={onBlurOrSubmit}>
-            {/* <label> */}
             <input
               type="text"
               className="todo__title-field"
@@ -86,7 +85,6 @@ export const TodoItem: React.FC<Props> = ({
               onBlur={onBlurOrSubmit}
               onKeyUp={onKeyUp}
             />
-            {/* </label> */}
           </form>
         )
         : (
