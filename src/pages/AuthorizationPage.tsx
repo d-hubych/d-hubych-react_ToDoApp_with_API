@@ -4,10 +4,12 @@ import React, {
   FormEvent,
   Dispatch,
   SetStateAction,
+  ChangeEvent,
 } from 'react';
 import cn from 'classnames';
 import { client } from '../utils/fetchClient';
 import { User } from '../types/User';
+import { minInputLength } from '../utils/contsnts';
 
 type Props = {
   setUser: Dispatch<SetStateAction<User | null>>;
@@ -19,7 +21,11 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
   const [isUserNotFound, setIsUserNotFound] = useState<boolean>(false);
   const [errAuthorization, setErrAuthorization] = useState<boolean>(false);
   const [isDisabledInput, setIsDisabledInput] = useState(false);
-  const minInputLength = 3;
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleEmailInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
 
   const onAuthorizationSubmit = (
     e: FormEvent<HTMLFormElement> | FormEvent<HTMLButtonElement>,
@@ -29,6 +35,8 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
     if (email.length < minInputLength) {
       return;
     }
+
+    setIsLoading(true);
 
     const handleReceivedUser = (receivedUser: User) => {
       const user = {
@@ -42,16 +50,30 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
     };
 
     if (isUserNotFound) {
-      client.post<User>('/users', { email, name })
-        .then((result) => {
+      if (name.length < minInputLength) {
+        setIsLoading(false);
+
+        return;
+      }
+
+      const postNewUser = async () => {
+        try {
+          const result = await client.post<User>('/users', { email, name });
+
           handleReceivedUser(result);
-        })
-        .catch(() => {
+        } catch {
           setErrAuthorization(true);
-        });
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      postNewUser();
     } else {
-      client.get<User[]>(`/users?email=${email}`)
-        .then((result) => {
+      const getUser = async () => {
+        try {
+          const result = await client.get<User[]>(`/users?email=${email}`);
+
           const user = result[0];
 
           if (user) {
@@ -60,10 +82,19 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
             setIsUserNotFound(true);
             setIsDisabledInput(true);
           }
-        })
-        .catch(() => setErrAuthorization(true));
+        } catch {
+          setErrAuthorization(true);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      getUser();
     }
   };
+
+  // eslint-disable-next-line
+  // console.log('render');
 
   return (
     <div className="todoapp authorization">
@@ -80,7 +111,7 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
             name="email"
             placeholder="Enter your email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailInput}
             className={cn(
               'input is-primary',
               'authorization__input',
@@ -106,17 +137,22 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
 
           <button
             type="submit"
-            className="button is-primary"
+            className={cn(
+              'button',
+              'is-primary',
+              { 'is-loading': isLoading },
+            )}
           >
             confirm
           </button>
         </form>
 
         {errAuthorization && (
-          <p>Something went wrong with the authorization.</p>
+          <p className="authorization__error">
+            Something went wrong with the authorization.
+          </p>
         )}
       </div>
-
     </div>
   );
 };

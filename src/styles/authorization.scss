@@ -27,8 +27,17 @@
     width: 70%;
     height: 40px;
 
+    &:invalid {
+      border: none;
+      outline: 2px solid rgb(255, 180, 180);
+    }
+
     @media (max-width: 425px) {
       width: 95%;
     }
+  }
+
+  &__error {
+    color: $c-danger;
   }
 }

@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/control-has-associated-label */
 import React, {
   FC,
   useEffect,
@@ -50,11 +49,17 @@ export const TodosPage: FC<Props> = ({ user }) => {
 
   useEffect(() => {
     if (USER_ID) {
-      getTodos(USER_ID)
-        .then(result => {
+      const getTodosFromSrver = async () => {
+        const result = await getTodos(USER_ID);
+
+        try {
           setTodos(result);
-        })
-        .catch(() => handleError(ErrorType.Load));
+        } catch {
+          handleError(ErrorType.Load);
+        }
+      };
+
+      getTodosFromSrver();
     }
   }, [USER_ID]);
 
@@ -65,13 +70,22 @@ export const TodosPage: FC<Props> = ({ user }) => {
     };
   }, [todos]);
 
+  const deleteTodoOnServer = async (todoId: number) => {
+    deleteTodo(todoId);
+
+    try {
+      setTodos(prev => prev.filter(({ id }) => id !== todoId));
+    } catch {
+      handleError(ErrorType.Delete);
+    } finally {
+      setTodoCondition(TodoCondition.Neutral);
+    }
+  };
+
   const handleDeleteTodo = (todoId: number) => {
     setTodoCondition(TodoCondition.Deleting);
     setProcesingTodosId([todoId]);
-    deleteTodo(todoId)
-      .then(() => setTodos(prev => prev.filter(({ id }) => id !== todoId)))
-      .catch(() => handleError(ErrorType.Delete))
-      .finally(() => setTodoCondition(TodoCondition.Neutral));
+    deleteTodoOnServer(todoId);
   };
 
   const clearCompleted = () => {
@@ -80,10 +94,7 @@ export const TodosPage: FC<Props> = ({ user }) => {
     todos?.forEach(todo => {
       if (todo.completed) {
         setProcesingTodosId((state) => [...state, todo.id]);
-        deleteTodo(todo.id)
-          .then(() => setTodos(prev => prev.filter(({ id }) => id !== todo.id)))
-          .catch(() => handleError(ErrorType.Delete))
-          .finally(() => setTodoCondition(TodoCondition.Neutral));
+        deleteTodoOnServer(todo.id);
       }
     });
   };
@@ -103,15 +114,20 @@ export const TodosPage: FC<Props> = ({ user }) => {
 
       copyTodos[indexCurTodo].completed = newStatus;
 
-      changeTodo(curentTodo.id, { completed: newStatus })
-        .then(() => {
+      const toggleTodoOnServer = async () => {
+        changeTodo(curentTodo.id, { completed: newStatus });
+
+        try {
           setTodos(copyTodos);
-        })
-        .catch(() => handleError(ErrorType.Update))
-        .finally(() => {
+        } catch {
+          handleError(ErrorType.Update);
+        } finally {
           setProcesingTodosId([]);
           setTodoCondition(TodoCondition.Neutral);
-        });
+        }
+      };
+
+      toggleTodoOnServer();
     });
   };
 
@@ -123,22 +139,29 @@ export const TodosPage: FC<Props> = ({ user }) => {
     setProcesingTodosId([todoId]);
     setTodoCondition(TodoCondition.Saving);
 
-    changeTodo(todoId, { title: newTitle })
-      .then(() => setTodos(prevTodos => prevTodos.map(todo => {
-        if (todo.id === todoId) {
-          return {
-            ...todo,
-            title: newTitle,
-          };
-        }
+    const changeTodoOnServer = async () => {
+      changeTodo(todoId, { title: newTitle });
 
-        return todo;
-      })))
-      .catch(() => ErrorType.Update)
-      .finally(() => {
+      try {
+        setTodos(prevTodos => prevTodos.map(todo => {
+          if (todo.id === todoId) {
+            return {
+              ...todo,
+              title: newTitle,
+            };
+          }
+
+          return todo;
+        }));
+      } catch {
+        setErrorType(ErrorType.Update);
+      } finally {
         setProcesingTodosId([]);
         setTodoCondition(TodoCondition.Neutral);
-      });
+      }
+    };
+
+    changeTodoOnServer();
   };
 
   const onLogout = () => {
@@ -147,6 +170,9 @@ export const TodosPage: FC<Props> = ({ user }) => {
   };
 
   const filteredTodos = todos ? filterTodos(todos, pathname) : [];
+
+  //  eslint-disable-next-line
+  console.log('render');
 
   return (
     <div className="todoapp">
