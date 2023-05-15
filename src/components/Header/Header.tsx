@@ -53,16 +53,21 @@ export const Header: FC<Props> = ({
     onTrickTempTodo(newTodo);
     setTitle('');
 
-    return addTodo(newTodo)
-      .then((result) => {
+    const addNewTodoOnServer = async () => {
+      const result = await addTodo(newTodo);
+
+      try {
         onTrickTempTodo(null);
         setTodos((prev: Todo[]) => [...prev, result]);
-      })
-      .catch(() => handleError(ErrorType.Add))
-      .finally(() => {
+      } catch {
+        handleError(ErrorType.Add);
+      } finally {
         setTodoCondition(TodoCondition.Neutral);
         setIsInputDisabled(false);
-      });
+      }
+    };
+
+    return addNewTodoOnServer();
   };
 
   return (

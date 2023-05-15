@@ -71,7 +71,7 @@ export const TodosPage: FC<Props> = ({ user }) => {
   }, [todos]);
 
   const deleteTodoOnServer = async (todoId: number) => {
-    deleteTodo(todoId);
+    await deleteTodo(todoId);
 
     try {
       setTodos(prev => prev.filter(({ id }) => id !== todoId));
@@ -115,7 +115,7 @@ export const TodosPage: FC<Props> = ({ user }) => {
       copyTodos[indexCurTodo].completed = newStatus;
 
       const toggleTodoOnServer = async () => {
-        changeTodo(curentTodo.id, { completed: newStatus });
+        await changeTodo(curentTodo.id, { completed: newStatus });
 
         try {
           setTodos(copyTodos);
@@ -140,7 +140,7 @@ export const TodosPage: FC<Props> = ({ user }) => {
     setTodoCondition(TodoCondition.Saving);
 
     const changeTodoOnServer = async () => {
-      changeTodo(todoId, { title: newTitle });
+      await changeTodo(todoId, { title: newTitle });
 
       try {
         setTodos(prevTodos => prevTodos.map(todo => {

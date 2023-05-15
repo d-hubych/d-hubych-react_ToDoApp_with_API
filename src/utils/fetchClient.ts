@@ -25,16 +25,19 @@ function request<T>(
     };
   }
 
-  // we wait for testing purpose to see loaders
-  return wait(300)
-    .then(() => fetch(BASE_URL + url, options))
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Something went wrong with the request to the server');
-      }
+  const requestOnServer = async () => {
+    await wait(300);
 
-      return response.json();
-    });
+    const response = await fetch(BASE_URL + url, options);
+
+    if (!response.ok) {
+      throw new Error('Something went wrong with the request to the server');
+    }
+
+    return response.json();
+  };
+
+  return requestOnServer();
 }
 
 export const client = {

@@ -56,9 +56,6 @@ export const TodoItem: React.FC<Props> = ({
     cancelEditing(e.key);
   };
 
-  // eslint-disable-next-line
-  console.log('todoCondition', todoCondition);
-
   return (
     <div
       className={classNames(
