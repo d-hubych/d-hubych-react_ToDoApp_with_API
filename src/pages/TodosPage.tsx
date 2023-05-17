@@ -171,9 +171,6 @@ export const TodosPage: FC<Props> = ({ user }) => {
 
   const filteredTodos = todos ? filterTodos(todos, pathname) : [];
 
-  //  eslint-disable-next-line
-  console.log('render');
-
   return (
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>

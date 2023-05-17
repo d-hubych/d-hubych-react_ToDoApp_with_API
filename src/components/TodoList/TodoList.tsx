@@ -22,24 +22,18 @@ export const TodoList: React.FC<Props> = ({
 }) => {
   return (
     <>
-      {todos.map((todo: Todo) => {
-        let thisTodoCondition = TodoCondition.Neutral;
-
-        if (procesingTodosId.includes(todo.id)) {
-          thisTodoCondition = todoCondition;
-        }
-
-        return (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            onDeleteTodo={onDeleteTodo}
-            todoCondition={thisTodoCondition}
-            toggleTodo={toggleTodo}
-            handleSubmitEditing={handleSubmitEditing}
-          />
-        );
-      })}
+      {todos.map((todo: Todo) => (
+        <TodoItem
+          key={todo.id}
+          todo={todo}
+          onDeleteTodo={onDeleteTodo}
+          todoCondition={procesingTodosId.includes(todo.id)
+            ? todoCondition
+            : TodoCondition.Neutral}
+          toggleTodo={toggleTodo}
+          handleSubmitEditing={handleSubmitEditing}
+        />
+      ))}
     </>
   );
 };

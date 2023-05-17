@@ -27,6 +27,29 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
     setEmail(e.target.value);
   };
 
+  const handleReceivedUser = (receivedUser: User) => {
+    const user = {
+      id: receivedUser.id,
+      email: receivedUser.email,
+      name: receivedUser.name,
+    };
+
+    setUser(user);
+    localStorage.setItem('user', JSON.stringify(user));
+  };
+
+  const postNewUser = async () => {
+    try {
+      const result = await client.post<User>('/users', { email, name });
+
+      handleReceivedUser(result);
+    } catch {
+      setErrAuthorization(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const onAuthorizationSubmit = (
     e: FormEvent<HTMLFormElement> | FormEvent<HTMLButtonElement>,
   ) => {
@@ -38,35 +61,12 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
 
     setIsLoading(true);
 
-    const handleReceivedUser = (receivedUser: User) => {
-      const user = {
-        id: receivedUser.id,
-        email: receivedUser.email,
-        name: receivedUser.name,
-      };
-
-      setUser(user);
-      localStorage.setItem('user', JSON.stringify(user));
-    };
-
     if (isUserNotFound) {
       if (name.length < minInputLength) {
         setIsLoading(false);
 
         return;
       }
-
-      const postNewUser = async () => {
-        try {
-          const result = await client.post<User>('/users', { email, name });
-
-          handleReceivedUser(result);
-        } catch {
-          setErrAuthorization(true);
-        } finally {
-          setIsLoading(false);
-        }
-      };
 
       postNewUser();
     } else {
@@ -92,9 +92,6 @@ export const AuthorizationPage: FC<Props> = ({ setUser }) => {
       getUser();
     }
   };
-
-  // eslint-disable-next-line
-  // console.log('render');
 
   return (
     <div className="todoapp authorization">
