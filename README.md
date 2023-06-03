@@ -3,7 +3,7 @@
 A single-page application that allows users to create and manage a list of tasks.<br />
 Created using functional components, hooks, fetch, routing, localStorage.
 
-###  ***[DEMO LINK](https://d-hubych.github.io/react_ToDoApp_with_API/)***
+###  ***[✔ DEMO LINK ✔](https://d-hubych.github.io/react_ToDoApp_with_API/)***
 
 ## Technologies used:
 - React
